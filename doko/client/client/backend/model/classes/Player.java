@@ -1,5 +1,5 @@
 package client.backend.model.classes;
 
-public abstract class user {
+public class Player extends User {
 
 }
