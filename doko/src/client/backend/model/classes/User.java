@@ -1,10 +1,15 @@
 package client.backend.model.classes;
 
-public abstract class User {
+import java.net.Socket;
+
+public class User {
 
 	private String username;
 	private int score;
-	private ConnectionSocket cs;
+	
+	public User(String username) {
+		this.username=username;
+	}
 	
 	public String getUsername() {
 		return username;
