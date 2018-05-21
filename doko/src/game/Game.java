@@ -3,21 +3,24 @@ package game;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import client.backend.model.classes.ConnectionSocket;
+import client.backend.model.classes.Player;
 import client.backend.model.classes.StateE;
 
 public class Game {
 
 	private ConnectionSocket connectionSocket;
-
 	private Lobby lobby;
+	private Player player;
 
 	public Game() {
 
 		connectionSocket = new ConnectionSocket();
-
 		lobby = new Lobby(connectionSocket);
-
+		player = new Player("Spieler");
 		nextAction();
 
 	}
@@ -37,7 +40,9 @@ public class Game {
 				try {
 					System.out.println("game started");
 					String cards = connectionSocket.getReader().readLine();
-					System.out.println(cards);
+					JSONArray jarr = new JSONObject(cards).getJSONArray("cards");
+					System.out.println(jarr.toString());
+					player.setKarten(jarr);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -45,6 +50,7 @@ public class Game {
 			}
 		}
 	}
+	
 
 	public boolean connectToServer() {
 		return lobby.connectToServer();
