@@ -25,7 +25,6 @@ public class LoginScreen implements GuiScreen {
 	private PasswordField password_field;
 	private Label login_failed_label;
 
-	private volatile boolean connected;
 	
 	public LoginScreen(Gui gui) {
 		this.gui = gui;

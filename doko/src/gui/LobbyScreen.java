@@ -43,6 +43,8 @@ public class LobbyScreen implements GuiScreen, Runnable {
 
 	private ConnectionSocket connectionSocket;
 
+	private volatile boolean gameStarted = false;
+
 	public LobbyScreen(Gui gui) {
 		this.gui = gui;
 
@@ -52,19 +54,24 @@ public class LobbyScreen implements GuiScreen, Runnable {
 		connectionSocket = ConnectionSocket.getInstance();
 
 		buildScreen();
-		updateData();
 	}
 
 	@Override
 	public void run() {
-		while (true) {
+
+		updateData();
+		while (!gameStarted)
 			getNextAction();
-		}
 
 	}
 
 	private void getNextAction() {
+
 		String jsonString = connectionSocket.readMessage();
+
+		if (jsonString == null)
+			return;
+
 		JSONObject json = new JSONObject(jsonString);
 
 		System.out.println("message: " + jsonString);
@@ -74,6 +81,16 @@ public class LobbyScreen implements GuiScreen, Runnable {
 				@Override
 				public void run() {
 					updateUserList(json);
+				}
+			});
+
+			return;
+		}
+		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.QUEUENUMBER.name())) {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					amount_queue.setText("In Queue: " + json.getString(JSONLobbyAttributes.NEWQUEUENUMBER.name()));
 				}
 			});
 
@@ -114,11 +131,12 @@ public class LobbyScreen implements GuiScreen, Runnable {
 
 			return;
 		}
-		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.QUEUENUMBER.name())) {
+		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.GAMESTART.name())) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					amount_queue.setText("In Queue: " + json.getString(JSONLobbyAttributes.NEWQUEUENUMBER.name()));
+					gameStarted = true;
+					gui.changeToGame();
 				}
 			});
 

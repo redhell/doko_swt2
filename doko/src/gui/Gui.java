@@ -8,7 +8,12 @@ public class Gui extends Application {
 
 	private Stage mainStage;
 	private Scene mainScene;
+	
 	private GuiScreen guiScreen;
+	private Thread currentScreen;
+	
+	private static final int window_width = 1024;
+	private static final int window_height = 600;
 
 	public Gui() {
 		guiScreen = new LoginScreen(this);
@@ -23,8 +28,8 @@ public class Gui extends Application {
 		mainStage.setScene(mainScene);
 
 		mainStage.setResizable(false);
-		mainStage.setHeight(500);
-		mainStage.setWidth(500);
+		mainStage.setWidth(window_width);
+		mainStage.setHeight(window_height);
 
 		mainStage.show();
 
@@ -32,9 +37,21 @@ public class Gui extends Application {
 
 	public void changeToLobby() {
 		guiScreen = new LobbyScreen(this);
-		Thread lobby_thread = new Thread((LobbyScreen) guiScreen);
-		lobby_thread.start();
 		mainScene.setRoot(guiScreen.getScreen());
+		currentScreen = new Thread((LobbyScreen) guiScreen);
+		currentScreen.start();
 	}
 
+	public void changeToGame() {
+		guiScreen = new GameScreen(this);
+		currentScreen.stop();
+		mainScene.setRoot(guiScreen.getScreen());
+		currentScreen = new Thread((GameScreen) guiScreen);
+		currentScreen.start();
+	}
+
+	public Stage getStage(){
+		return mainStage;
+	}
+	
 }
