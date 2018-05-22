@@ -33,14 +33,14 @@ public class GameScreen implements GuiScreen, Runnable {
 
 	private ConnectionSocket connectionSocket;
 
-	//private CardManager cardManager;
+	private CardManager cardManager;
 
 	public GameScreen(Gui gui) {
 		this.gui = gui;
 
 		connectionSocket = ConnectionSocket.getInstance();
 
-		//cardManager = new CardManager();
+		cardManager = new CardManager();
 
 		buildScreen();
 	}
@@ -64,19 +64,13 @@ public class GameScreen implements GuiScreen, Runnable {
 	}
 
 	private void getCards() {
-		System.out.println("getCards");
 		String cards = connectionSocket.readMessage();
-		System.out.println("afterGetCards");
-		System.out.println("cards: " + cards);
 		if (cards == null)
 			return;
 
 		JSONObject json = new JSONObject(cards);
 		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.SHUFFLE.name())) {
-			System.out.println(json);
-			//cardManager.setCards(json);
-
-			return;
+			cardManager.setCards(json);
 		}
 
 	}
@@ -85,23 +79,7 @@ public class GameScreen implements GuiScreen, Runnable {
 
 		pane = new BorderPane();
 
-		VBox asdf = new VBox();
-		ObservableList<String> users;
-		ListView<String> userList;
-
-		users = FXCollections.observableArrayList();
-		users.add("asdf");
-		users.add("asdf");
-		users.add("asdf");
-		users.add("asdf");
-		userList = new ListView<>(users);
-
-		asdf.getChildren().add(userList);
-		
-		((BorderPane) pane).setRight(asdf);
-		//((BorderPane) pane).setBottom(cardManager.getNode());
-		System.out.println("done building screen");
-
+		((BorderPane) pane).setBottom(cardManager.getNode());
 	}
 
 	@Override

@@ -132,10 +132,10 @@ public class LobbyScreen implements GuiScreen, Runnable {
 			return;
 		}
 		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.GAMESTART.name())) {
+			gameStarted = true;
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					gameStarted = true;
 					gui.changeToGame();
 				}
 			});

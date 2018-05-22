@@ -2,7 +2,6 @@ package entities;
 
 public enum SymbolE {
 
+	KREUZ, PIK, HERZ, KARO
 
-	KREUZ,PIK,HERZ,KARO
-	
 }
