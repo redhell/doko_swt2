@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="doko.SampleController">
+   <center>
+      <GridPane alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="278.0" prefWidth="600.0" style="-fx-background-color: green;" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="201.0" minWidth="10.0" prefWidth="120.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="395.0" minWidth="10.0" prefWidth="371.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="196.0" minWidth="10.0" prefWidth="109.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="202.0" minHeight="0.0" prefHeight="48.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="315.0" minHeight="0.0" prefHeight="117.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="408.0" minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Button alignment="CENTER" mnemonicParsing="false" prefHeight="50.0" prefWidth="250.0" text="An Spiel teilnehmen" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+            <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="107.0" text="Spielername" />
+            <TextField prefHeight="27.0" prefWidth="230.0" GridPane.columnIndex="1" GridPane.valignment="CENTER" />
+            <Button alignment="CENTER" mnemonicParsing="false" prefHeight="50.0" prefWidth="250.0" text="Regeln" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+         </children>
+      </GridPane>
+   </center>
+   <top>
+      <Pane minHeight="-Infinity" minWidth="-Infinity" prefHeight="113.0" prefWidth="600.0" style="-fx-background-color: green;" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" layoutX="126.0" layoutY="38.0" prefHeight="52.0" prefWidth="348.0" text="Doppelkopf ohne Luschen">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
+   </top>
+</BorderPane>

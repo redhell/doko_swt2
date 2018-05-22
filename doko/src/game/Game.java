@@ -1,6 +1,9 @@
 package game;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.json.JSONArray;
@@ -13,8 +16,13 @@ import client.backend.model.classes.StateE;
 public class Game {
 
 	private ConnectionSocket connectionSocket;
+	
 	private Lobby lobby;
 	private Player player;
+	
+	private Map<Player, Card> board;
+	private Map<Player, List<Card>> assignedCards;
+	private Player roundStarter;
 
 	public Game() {
 
@@ -22,6 +30,9 @@ public class Game {
 		lobby = new Lobby(connectionSocket);
 		player = new Player("Spieler");
 		nextAction();
+		
+		board = new HashMap<Player, Card>(4);
+		assignedCards = new HashMap<Player, List<Card>>();
 
 	}
 
@@ -59,5 +70,41 @@ public class Game {
 	public StateE queueForGame() {
 		return lobby.queueForGame();
 	}
+	
+	public boolean validPlay(Player p, Card card) {
+		/** Check card: Ob eine Trumpfkarte gespielt wurde oder das Symbol, zu dem des Spieleröffners, passt
+		 */
+		if(!card.isTrumpf()	&&	card.getSymbol() !=	board.get(roundStarter).getSymbol()) {
+			
+			if(assignedCards.get(p).contains(board.get(roundStarter).getSymbol())) {
+				System.out.println("Zug nicht zulässig. Sie besitzen noch eine spielbare Karte");
+				return false;
+			}
+			else {
+				board.put(p, card);
+				return true;
+			}
+		}
+		return true;
+	}
+	
+	public void playedCard(Player p, Card card) {
+		/**
+		 * 	Regel: Spieler 1 legt seine Karte und eröffnet die Runde, die anderen Spieler müssen, dasselbe Symbol legen. 
+		 * 	Ansonsten einen Trumpf oder eine Fehlfarbe.
+		 */
+		if(board.isEmpty()) {
+			roundStarter=p;
+			board.put(p, card);			
+		}
+		else {
+			while(!validPlay(p, card)) {
+				System.out.println("Unzulässiger Zug!");
+			}
+			board.put(p, card);
+		}	
+	}
+	
+	
 
 }
