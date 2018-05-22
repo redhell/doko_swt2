@@ -1,4 +1,4 @@
-package client.backend.model.classes;
+package entities;
 
 import java.net.Socket;
 
