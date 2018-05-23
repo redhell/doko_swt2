@@ -43,8 +43,7 @@ public class LoginButtonHandler implements EventHandler<ActionEvent> {
 		login_credentials.put(JSONAttributesE.USERNAME.name(), username);
 		login_credentials.put(JSONAttributesE.PASSWORD.name(), password);
 
-		boolean login_successful = connectionSocket.login(login_credentials.toString());
-
+		boolean login_successful = connectionSocket.login(login_credentials);
 		if (login_successful) {
 			login_failed_label.setTextFill(Color.GREEN);
 			login_failed_label.setText("success");

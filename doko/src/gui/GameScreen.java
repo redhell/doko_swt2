@@ -1,30 +1,15 @@
 package gui;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.json.JSONObject;
 
 import backend.ConnectionSocket;
 import backend.enums.JSONActionsE;
 import backend.enums.JSONEventsE;
-import backend.enums.JSONIngameAttributes;
-import entities.Card;
-import entities.SymbolE;
-import entities.WertigkeitE;
-import game.CardManager;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import game.GameScreenSync;
+import game.PlayerField;
+import javafx.application.Platform;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 
 public class GameScreen implements GuiScreen, Runnable {
 
@@ -33,22 +18,26 @@ public class GameScreen implements GuiScreen, Runnable {
 
 	private ConnectionSocket connectionSocket;
 
-	private CardManager cardManager;
+	private PlayerField playerField;
+	private GameScreenSync gameScreenSync;
 
 	public GameScreen(Gui gui) {
 		this.gui = gui;
 
 		connectionSocket = ConnectionSocket.getInstance();
 
-		cardManager = new CardManager();
+		playerField = new PlayerField(this,connectionSocket.getUsername());
+		gameScreenSync = new GameScreenSync(this, connectionSocket.getUsername());
 
-		buildScreen();
+		pane = new BorderPane();
 	}
 
 	@Override
 	public void run() {
 
 		getCards();
+		getOrder();
+		buildScreen();
 		while (true)
 			nextAction();
 
@@ -70,16 +59,39 @@ public class GameScreen implements GuiScreen, Runnable {
 
 		JSONObject json = new JSONObject(cards);
 		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.SHUFFLE.name())) {
-			cardManager.setCards(json);
+			playerField.setCards(json);
+		}
+
+	}
+
+	private void getOrder() {
+		String order = connectionSocket.readMessage();
+		if (order == null)
+			return;
+
+		JSONObject json = new JSONObject(order);
+		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.MOVEORDER.name())) {
+			gameScreenSync.buildScreen(json);
 		}
 
 	}
 
 	private void buildScreen() {
 
-		pane = new BorderPane();
+		Platform.runLater(new Runnable() {
 
-		((BorderPane) pane).setBottom(cardManager.getNode());
+			@Override
+			public void run() {
+
+				((BorderPane) pane).setTop(gameScreenSync.getTopPlayer());
+				((BorderPane) pane).setRight(gameScreenSync.getRightPlayer());
+				((BorderPane) pane).setLeft(gameScreenSync.getLeftPlayer());
+				((BorderPane) pane).setBottom(playerField.getNode());
+
+			}
+
+		});
+
 	}
 
 	@Override

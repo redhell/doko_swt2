@@ -21,6 +21,8 @@ public class ConnectionSocket {
 
 	private static ConnectionSocket instance;
 
+	private String username;
+
 	private boolean connected = false;
 
 	private ConnectionSocket() {
@@ -34,14 +36,15 @@ public class ConnectionSocket {
 		return ConnectionSocket.instance;
 	}
 
-	public boolean login(String json_credentials) {
+	public boolean login(JSONObject json_credentials) {
 		if (!connected) {
 			try {
 				socket = new Socket("localhost", 25000);
 				writer = new PrintWriter(socket.getOutputStream(), true);
 				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-				sendMessage(json_credentials);
+				String temp_username = json_credentials.getString(JSONAttributesE.USERNAME.name());
+				sendMessage(json_credentials.toString());
 
 				String response = readMessage();
 
@@ -49,9 +52,15 @@ public class ConnectionSocket {
 				if (json_response.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.LOGIN.name())) {
 					if (json_response.getString(JSONEventsE.LOGIN.name())
 							.equals(JSONAttributesE.LOGINVERIFIED.name())) {
+						this.username = temp_username;
+						temp_username = null;
 						connected = true;
-					} else
+					} else {
+						this.username = null;
+						temp_username = null;
 						connected = false;
+					}
+
 				}
 
 			} catch (UnknownHostException e) {
@@ -67,6 +76,10 @@ public class ConnectionSocket {
 	public void sendMessage(String message) {
 		writer.println(message);
 		writer.flush();
+	}
+
+	public String getUsername() {
+		return this.username;
 	}
 
 	public String readMessage() {

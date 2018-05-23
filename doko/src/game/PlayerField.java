@@ -13,22 +13,49 @@ import entities.Card;
 import entities.CardE;
 import entities.SymbolE;
 import entities.WertigkeitE;
+import gui.GameScreen;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
-public class CardManager {
+public class PlayerField extends PlayerFieldPane{
 
-	private HBox cardView;
+	private GameScreen gameScreen;
+
 	private List<Card> cards;
+	private HBox cardView;
+	
+	private HBox usernameBox;
+	private Label usernameLabel;
 
-	public CardManager() {
+	List<ImageView> cardList = new LinkedList<ImageView>();
+
+	private final static double cardScale = 1.25;
+
+	public PlayerField(String username) {
+		super(username);
+	}
+	
+	public PlayerField(GameScreen gameScreen,String username) {
+		super(username);
+		this.gameScreen = gameScreen;
+		
+		pane = new BorderPane();
 		cardView = new HBox(5);
-		cardView.setPadding((new Insets(15, 15, 15, 15)));
-
+		
+		usernameBox = new HBox();
+		usernameLabel = new Label(username);
+		usernameLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		usernameBox.getChildren().add(usernameLabel);
+		usernameBox.setAlignment(Pos.CENTER);
+		
 		cards = new LinkedList<Card>();
 	}
 
@@ -36,19 +63,12 @@ public class CardManager {
 		JSONArray cardsArr = jsonCards.getJSONArray(JSONIngameAttributes.CARDS.name());
 		FileInputStream input;
 		ImageView imageView = null;
-		List<ImageView> temp_list = new LinkedList<ImageView>();
 
 		for (int i = 0; i < cardsArr.length(); i++) {
 			JSONObject temp = cardsArr.getJSONObject(i);
-			System.out.println(temp.toString());
 
 			String wertigkeit = temp.getString(CardE.WERTIGKEIT.name());
 			String symbol = temp.getString(CardE.SYMBOL.name());
-			System.out.println("WERTIGKEIT: " + wertigkeit);
-			System.out.println("SYMBOL: " + symbol);
-
-			System.out.println("VALUEOF WERTIGKEIT: " + WertigkeitE.valueOf(wertigkeit));
-			System.out.println("VALUEOF Symbol: " + SymbolE.valueOf(symbol));
 
 			Card card = new Card(WertigkeitE.valueOf(wertigkeit), SymbolE.valueOf(symbol));
 			cards.add(card);
@@ -57,23 +77,32 @@ public class CardManager {
 				input = new FileInputStream(card.getPath());
 				Image image = new Image(input);
 				imageView = new ImageView(image);
-				temp_list.add(imageView);
+				cardList.add(imageView);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 
 		}
 		
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				cardView.getChildren().addAll(temp_list);
-			}
-		});
+		buildScreen();
 	}
 
 	public Node getNode() {
-		return cardView;
+		return pane;
 	}
 
+	@Override
+	public void buildScreen() {
+
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				cardView.getChildren().addAll(cardList);
+				((BorderPane) pane).setTop(usernameBox);
+				((BorderPane) pane).setCenter(cardView);
+			}
+		});
+	
+	}
+	
 }

@@ -13,8 +13,10 @@ public class Gui extends Application {
 	private Thread currentScreen;
 	
 	private static final int window_width = 1024;
-	private static final int window_height = 600;
-
+	private static final int window_height = 850;
+	private static final boolean resizable = true;
+	
+	
 	public Gui() {
 		guiScreen = new LoginScreen(this);
 		mainScene = new Scene(guiScreen.getScreen());
@@ -27,7 +29,7 @@ public class Gui extends Application {
 
 		mainStage.setScene(mainScene);
 
-		mainStage.setResizable(false);
+		mainStage.setResizable(resizable);
 		mainStage.setWidth(window_width);
 		mainStage.setHeight(window_height);
 
@@ -49,7 +51,7 @@ public class Gui extends Application {
 		currentScreen = new Thread((GameScreen) guiScreen);
 		currentScreen.start();
 	}
-
+	
 	public Stage getStage(){
 		return mainStage;
 	}
