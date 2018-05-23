@@ -29,7 +29,7 @@ public class TopPlayerField extends PlayerFieldPane {
 
 		pane = new BorderPane();
 
-		cardView = new HBox();
+		cardView = new HBox(5);
 		cardList = new LinkedList<ImageView>();
 
 		usernameBox = new HBox();

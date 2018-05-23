@@ -1,5 +1,5 @@
 package backend.enums;
 
 public enum JSONIngameAttributes {
-	CARDS, ORDER
+	CARDS, ORDER, TIMELEFT, CARD
 }
