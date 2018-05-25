@@ -6,7 +6,6 @@ import client.backend.model.classes.StateE;
 public class Lobby {
 
 	private ConnectionSocket connectionSocket;
-	private Game game;
 
 	public Lobby(ConnectionSocket connectionSocket) {
 		this.connectionSocket = connectionSocket;

@@ -10,29 +10,29 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import client.backend.model.classes.ConnectionSocket;
-import client.backend.model.classes.Player;
 import client.backend.model.classes.StateE;
+import client.backend.model.classes.User;
 
 public class Game {
 
 	private ConnectionSocket connectionSocket;
 	
 	private Lobby lobby;
-	private Player player;
+	private User player;
 	
-	private Map<Player, Card> board;
-	private Map<Player, List<Card>> assignedCards;
-	private Player roundStarter;
+	private Map<User, Card> board;
+	private Map<User, List<Card>> assignedCards;
+	private User roundStarter;
 
 	public Game() {
 
 		connectionSocket = new ConnectionSocket();
 		lobby = new Lobby(connectionSocket);
-		player = new Player("Spieler");
+		player = new User("Spieler");
 		nextAction();
 		
-		board = new HashMap<Player, Card>(4);
-		assignedCards = new HashMap<Player, List<Card>>();
+		board = new HashMap<User, Card>(4);
+		assignedCards = new HashMap<User, List<Card>>();
 
 	}
 
@@ -71,7 +71,7 @@ public class Game {
 		return lobby.queueForGame();
 	}
 	
-	public boolean validPlay(Player p, Card card) {
+	public boolean validPlay(User p, Card card) {
 		/** Check card: Ob eine Trumpfkarte gespielt wurde oder das Symbol, zu dem des Spieleröffners, passt
 		 */
 		if(!card.isTrumpf()	&&	card.getSymbol() !=	board.get(roundStarter).getSymbol()) {
@@ -88,7 +88,7 @@ public class Game {
 		return true;
 	}
 	
-	public void playedCard(Player p, Card card) {
+	public void playedCard(User p, Card card) {
 		/**
 		 * 	Regel: Spieler 1 legt seine Karte und eröffnet die Runde, die anderen Spieler müssen, dasselbe Symbol legen. 
 		 * 	Ansonsten einen Trumpf oder eine Fehlfarbe.

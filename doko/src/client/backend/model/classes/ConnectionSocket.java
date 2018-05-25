@@ -10,19 +10,11 @@ import org.json.JSONObject;
 
 public class ConnectionSocket {
 
-	private User user;
-
 	private Socket socket;
 	private PrintWriter out;
 	private BufferedReader in;
 
 	private boolean connected = false;
-	
-	private StateE state;
-
-	public ConnectionSocket() {
-		user = new User("user1");
-	}
 
 
 	public boolean connectToServer() {
