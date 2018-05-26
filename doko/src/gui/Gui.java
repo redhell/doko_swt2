@@ -12,10 +12,10 @@ public class Gui extends Application {
 	private GuiScreen guiScreen;
 	private Thread currentScreen;
 
-	private static final int window_width = 700;
-	private static final int window_height = 550;
-	private static final int GAMESCREEN_WIDTH = 700;
-	private static final int GAMESCREEN_HEIGHT = 550;
+	public static final int window_width = 700;
+	public static final int window_height = 550;
+	public static final int GAMESCREEN_WIDTH = 1024;
+	public static final int GAMESCREEN_HEIGHT = 850;
 	
 	private static final boolean resizable = false;
 	
@@ -62,11 +62,11 @@ public class Gui extends Application {
 	}
 	
 	public void setWidth(int w) {
-		window_width = w;
+		mainStage.setWidth(w);
 	}
 	
 	public void setHeight(int h) {
-		window_height = h;
+		mainStage.setHeight(h);
 	}
 	
 	public void StageResizable(boolean sizeable) {

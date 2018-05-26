@@ -232,8 +232,8 @@ public class LobbyScreen implements GuiScreen, Runnable {
 		//((BorderPane) pane).setBottom(hbox);
 		
 		
-		gui.setHeight(360);
-		gui.setWidth(480);
+		gui.setHeight(Gui.window_height);
+		gui.setWidth(Gui.window_width);
 
 	}
 
