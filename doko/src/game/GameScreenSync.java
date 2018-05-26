@@ -9,7 +9,9 @@ import java.util.Map;
 import org.json.JSONObject;
 
 import backend.enums.JSONIngameAttributes;
+import entities.Card;
 import gui.GameScreen;
+import javafx.application.Platform;
 import javafx.scene.Node;
 
 public class GameScreenSync {
@@ -19,6 +21,8 @@ public class GameScreenSync {
 	private TopPlayerField topPlayer;
 	private RightPlayerField rightPlayer;
 	private LeftPlayerField leftPlayer;
+	
+	private CardDeck cardDeck;
 
 	private String username;
 
@@ -74,6 +78,8 @@ public class GameScreenSync {
 			rightPlayer = new RightPlayerField(orderMap.get(keys.get(2)));
 
 		}
+		
+		cardDeck = new CardDeck();
 
 	}
 
@@ -87,6 +93,39 @@ public class GameScreenSync {
 
 	public Node getLeftPlayer() {
 		return leftPlayer.getPane();
+	}
+	
+	public Node getCardDeck(){
+		return cardDeck.getPane();
+	}
+
+	public void updateField(Card card, String playedBy) {
+		
+		//delete card from enemy player
+		Platform.runLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(leftPlayer.getUsername().equals(playedBy)){
+					leftPlayer.removeCard();
+				}else if(topPlayer.getUsername().equals(playedBy)){
+					topPlayer.removeCard();
+				}else if(rightPlayer.getUsername().equals(playedBy)){
+					rightPlayer.removeCard();
+				} 
+				
+			}
+		});
+		
+		
+		//update deck
+		cardDeck.addCard(card);
+	}
+
+	public void updateRoundWinner(String roundWinner) {
+		
+		cardDeck.updateRoundWinner(roundWinner);
+		
 	}
 
 }

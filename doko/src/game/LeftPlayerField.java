@@ -7,6 +7,7 @@ import java.util.List;
 
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -60,6 +61,26 @@ public class LeftPlayerField extends PlayerFieldPane {
 			}
 		});
 
+	}
+	
+	public void removeCard() {
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+
+				Node to_remove = null;
+
+				for (Node n : pane.getChildren()) {
+					if (n instanceof ImageView) {
+						to_remove = n;
+						break;
+					}
+				}
+
+				pane.getChildren().remove(to_remove);
+			}
+		});
 	}
 
 }

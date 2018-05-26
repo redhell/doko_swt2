@@ -1,5 +1,8 @@
 package game;
 
+import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
 public abstract class PlayerFieldPane {

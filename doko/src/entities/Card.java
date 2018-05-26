@@ -57,5 +57,10 @@ public class Card implements Comparable<Card>{
 		return "assets/" + this.toString() + ".png";
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		Card otherCard = (Card) obj;
+		return this.symbol == otherCard.symbol && this.wertigkeit == otherCard.wertigkeit;
+	}
 	
 }

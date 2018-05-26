@@ -8,6 +8,8 @@ import backend.enums.JSONEventsE;
 import backend.enums.JSONIngameAttributes;
 import entities.Card;
 import entities.CardE;
+import entities.SymbolE;
+import entities.WertigkeitE;
 import game.GameScreenSync;
 import game.PlayerField;
 import javafx.application.Platform;
@@ -25,13 +27,15 @@ public class GameScreen implements GuiScreen, Runnable {
 	private PlayerField playerField;
 	private GameScreenSync gameScreenSync;
 
+	public static final int ROUNDTIMER = 10;
+
 	public GameScreen(Gui gui) {
 		this.gui = gui;
 
 		connectionSocket = ConnectionSocket.getInstance();
 
-		playerField = new PlayerField(this, connectionSocket.getUsername());
 		gameScreenSync = new GameScreenSync(this, connectionSocket.getUsername());
+		playerField = new PlayerField(this, gameScreenSync, connectionSocket.getUsername());
 
 		pane = new BorderPane();
 	}
@@ -39,24 +43,12 @@ public class GameScreen implements GuiScreen, Runnable {
 	@Override
 	public void run() {
 
-		flushSocket();
 		getCards();
 		getOrder();
 		buildScreen();
 		while (true)
 			nextAction();
 
-	}
-
-	private void flushSocket() {
-		
-		JSONObject json = new JSONObject();
-		json.put(JSONActionsE.EVENT.name(), JSONEventsE.FLUSH.name());
-		
-		for(int i=0;i<3;i++){
-			connectionSocket.sendMessage(json.toString());			
-		}
-		
 	}
 
 	private void nextAction() {
@@ -70,31 +62,71 @@ public class GameScreen implements GuiScreen, Runnable {
 
 		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.MAKEMOVE.name())) {
 
-			if (json.getString(JSONEventsE.MAKEMOVE.name()).equals(JSONIngameAttributes.TIMELEFT.name())) {
+			if (json.getString(JSONEventsE.MAKEMOVE.name()).equals(JSONIngameAttributes.GETMOVE.name())) {
 
-				playerField.updateTime(json.getString(JSONIngameAttributes.TIMELEFT.name()));
+				System.out.println("GETTING MOVE");
+				playerField.makeMove(JSONIngameAttributes.GETMOVE, null);
 
-			} else {
+			} else if (json.getString(JSONEventsE.MAKEMOVE.name()).equals(JSONIngameAttributes.INVALID.name())) {
 
-				System.out.println("make move");
-				playerField.makeMove();
+				System.out.println("INVALID");
+				playerField.makeMove(JSONIngameAttributes.INVALID, null);
+
+			} else if (json.getString(JSONEventsE.MAKEMOVE.name()).equals(JSONIngameAttributes.VALID.name())) {
+
+				System.out.println("VALID");
+
+				JSONObject jsonCard = (JSONObject) json.get(JSONIngameAttributes.CARD.name());
+				WertigkeitE wertigkeit = WertigkeitE.valueOf(jsonCard.get(CardE.WERTIGKEIT.name()).toString());
+				SymbolE symbol = SymbolE.valueOf(jsonCard.get(CardE.SYMBOL.name()).toString());
+
+				Card parsedCard = new Card(wertigkeit, symbol);
+
+				playerField.makeMove(JSONIngameAttributes.VALID, parsedCard);
+				playerField.removeCardFromDeck(parsedCard, JSONIngameAttributes.VALID);
+
+			} else if (json.getString(JSONEventsE.MAKEMOVE.name()).equals(JSONIngameAttributes.TIMEEXPIRED.name())) {
+
+				System.out.println("TIMEXPIRED");
+
+				JSONObject jsonCard = (JSONObject) json.get(JSONIngameAttributes.CARD.name());
+				WertigkeitE wertigkeit = WertigkeitE.valueOf(jsonCard.get(CardE.WERTIGKEIT.name()).toString());
+				SymbolE symbol = SymbolE.valueOf(jsonCard.get(CardE.SYMBOL.name()).toString());
+
+				Card parsedCard = new Card(wertigkeit, symbol);
+
+				playerField.makeMove(JSONIngameAttributes.TIMEEXPIRED, parsedCard);
+				playerField.removeCardFromDeck(parsedCard, JSONIngameAttributes.TIMEEXPIRED);
 
 			}
 
 			return;
-		}
 
-	}
+		} else if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.CARDBROADCAST.name())) {
+
+			System.out.println("client received broadcast");
+
+			JSONObject jsonCard = (JSONObject) json.get(JSONIngameAttributes.CARD.name());
+			WertigkeitE wertigkeit = WertigkeitE.valueOf(jsonCard.get(CardE.WERTIGKEIT.name()).toString());
+			SymbolE symbol = SymbolE.valueOf(jsonCard.get(CardE.SYMBOL.name()).toString());
+
+			Card parsedCard = new Card(wertigkeit, symbol);
+
+			String playedBy = json.getString(JSONIngameAttributes.PLAYEDBY.name());
+
+			gameScreenSync.updateField(parsedCard, playedBy);
+
+			return;
 	
-	public void makeMove(Card card){
-		JSONObject json = new JSONObject();
-		json.put(JSONActionsE.EVENT.name(), JSONEventsE.MAKEMOVE.name());
-		JSONObject jsonCard = new JSONObject();
-		jsonCard.put(CardE.WERTIGKEIT.name(), card.getWertigkeit());
-		jsonCard.put(CardE.SYMBOL.name(), card.getSymbol());
-		json.put(JSONIngameAttributes.CARD.name(), jsonCard);
+		} else if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.ROUNDWINNER.name())) {
 
-		connectionSocket.sendMessage(json.toString());
+			String roundWinner = json.getString(JSONEventsE.ROUNDWINNER.name());
+
+			System.out.println("got roundwinner: " + roundWinner);
+			
+			gameScreenSync.updateRoundWinner(roundWinner);
+
+		}
 
 	}
 
@@ -133,7 +165,7 @@ public class GameScreen implements GuiScreen, Runnable {
 				((BorderPane) pane).setTop(gameScreenSync.getTopPlayer());
 				((BorderPane) pane).setRight(gameScreenSync.getRightPlayer());
 				((BorderPane) pane).setLeft(gameScreenSync.getLeftPlayer());
-				((BorderPane) pane).setCenter(new Label("CARDS"));
+				((BorderPane) pane).setCenter(gameScreenSync.getCardDeck());
 
 			}
 

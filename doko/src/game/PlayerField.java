@@ -29,13 +29,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class PlayerField extends PlayerFieldPane {
 
 	private GameScreen gameScreen;
+	private GameScreenSync gameScreenSync;
 	private ConnectionSocket connectionSocket = ConnectionSocket.getInstance();
+	private MoveTimer moveTimer;
 
 	private HBox cardView;
 
@@ -43,6 +47,9 @@ public class PlayerField extends PlayerFieldPane {
 	private Label usernameLabel;
 
 	private Label timeLabel;
+
+	private VBox gameInfoBox;
+	private Label gameInfo;
 	private Button playCardButton;
 
 	Map<ImageView, Card> cardList = new HashMap<ImageView, Card>();
@@ -52,10 +59,12 @@ public class PlayerField extends PlayerFieldPane {
 	private volatile boolean canMove = false;
 
 	private Card currentCardPicked = null;
+	private String currentCardID = "-1";
 
-	public PlayerField(GameScreen gameScreen, String username) {
+	public PlayerField(GameScreen gameScreen, GameScreenSync gameScreenSync, String username) {
 		super(username);
 		this.gameScreen = gameScreen;
+		this.gameScreenSync = gameScreenSync;
 
 		pane = new BorderPane();
 		cardView = new HBox(5);
@@ -67,7 +76,12 @@ public class PlayerField extends PlayerFieldPane {
 		usernameBox.setAlignment(Pos.CENTER);
 
 		timeLabel = new Label("Time left:");
+
+		gameInfoBox = new VBox();
 		playCardButton = new Button("play Card");
+		gameInfo = new Label("");
+		gameInfoBox.getChildren().add(gameInfo);
+		gameInfoBox.getChildren().add(playCardButton);
 
 	}
 
@@ -93,9 +107,11 @@ public class PlayerField extends PlayerFieldPane {
 					@Override
 					public void handle(MouseEvent event) {
 						currentCardPicked = cardList.get(event.getSource());
+						currentCardID = ((ImageView) event.getSource()).getId();
 						event.consume();
 					}
 				});
+				imageView.setId(i + "");
 				cardList.put(imageView, card);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -106,16 +122,6 @@ public class PlayerField extends PlayerFieldPane {
 		buildScreen();
 	}
 
-	public Node getNode() {
-		return pane;
-	}
-
-	public void updateTime(String time) {
-
-		timeLabel.setText("Time left: " + time);
-
-	}
-
 	@Override
 	public void buildScreen() {
 
@@ -124,13 +130,20 @@ public class PlayerField extends PlayerFieldPane {
 			@Override
 			public void handle(ActionEvent event) {
 
-				if (canMove) {
+				if (canMove && moveTimer.hasTime()) {
 
-					gameScreen.makeMove(currentCardPicked);
+					JSONObject json = new JSONObject();
+					json.put(JSONActionsE.EVENT.name(), JSONEventsE.MAKEMOVE.name());
+					json.put(JSONEventsE.MAKEMOVE.name(), JSONIngameAttributes.CARD.name());
+					JSONObject jsonCard = new JSONObject();
+					jsonCard.put(CardE.WERTIGKEIT.name(), currentCardPicked.getWertigkeit());
+					jsonCard.put(CardE.SYMBOL.name(), currentCardPicked.getSymbol());
+					json.put(JSONIngameAttributes.CARD.name(), jsonCard);
 
+					connectionSocket.sendMessage(json.toString());
+
+					canMove = false;
 				}
-
-				canMove = false;
 
 			}
 		});
@@ -143,16 +156,129 @@ public class PlayerField extends PlayerFieldPane {
 				((BorderPane) pane).setTop(usernameBox);
 				((BorderPane) pane).setCenter(cardView);
 				((BorderPane) pane).setLeft(timeLabel);
-				((BorderPane) pane).setRight(playCardButton);
+				((BorderPane) pane).setRight(gameInfoBox);
 			}
 
 		});
 
 	}
 
-	public void makeMove() {
+	public void makeMove(JSONIngameAttributes attribute, Card card) {
 
-		canMove = true;
+		String setText = "";
+
+		if (attribute == JSONIngameAttributes.GETMOVE) {
+			moveTimer = new MoveTimer(this, timeLabel);
+			moveTimer.start();
+			canMove = true;
+			gameInfo.setTextFill(Color.GREEN);
+			setText = "PICK A CARD";
+			System.out.println("PICKACARD");
+		} else if (attribute == JSONIngameAttributes.INVALID) {
+			canMove = true;
+			gameInfo.setTextFill(Color.RED);
+			setText = "CANNOT PLAY THAT CARD";
+		} else if (attribute == JSONIngameAttributes.VALID) {
+			canMove = false;
+			moveTimer.done();
+			moveTimer.stop();
+			gameInfo.setTextFill(Color.GREEN);
+			setText = "CARD ACCEPTED: " + card;
+			gameScreenSync.updateField(card, connectionSocket.getUsername());
+		} else if (attribute == JSONIngameAttributes.TIMEEXPIRED) {
+			canMove = false;
+			moveTimer.done();
+			moveTimer.stop();
+			gameInfo.setTextFill(Color.GREEN);
+			setText = "TIME EXPIRED;\nRANDOM CARD PICKED: " + card;
+			gameScreenSync.updateField(card, connectionSocket.getUsername());
+		}
+
+		final String infoBoxTextUpdate = setText;
+
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+
+				gameInfo.setText(infoBoxTextUpdate);
+
+			}
+
+		});
+
+	}
+
+	public void timeExpired() {
+
+		canMove = false;
+
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				timeLabel.setTextFill(Color.RED);
+				timeLabel.setText("timer expired!");
+				gameInfo.setTextFill(Color.RED);
+				gameInfo.setText("Timer expired!");
+
+				JSONObject json = new JSONObject();
+				json.put(JSONActionsE.EVENT.name(), JSONEventsE.MAKEMOVE.name());
+				json.put(JSONEventsE.MAKEMOVE.name(), JSONIngameAttributes.TIMEEXPIRED.name());
+
+				connectionSocket.sendMessage(json.toString());
+
+			}
+		});
+
+	}
+
+	public Node getNode() {
+		return pane;
+	}
+
+	public void removeCardFromDeck(Card to_remove, JSONIngameAttributes attribute) {
+
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+
+				Node hasToBeRemoved = null;
+
+				if (attribute == JSONIngameAttributes.VALID) {
+
+					for (Node image : cardView.getChildren()) {
+
+						ImageView temp = (ImageView) image;
+						if (temp.getId().equals(currentCardID)) {
+							hasToBeRemoved = temp;
+							break;
+						}
+
+					}
+
+					cardView.getChildren().remove(hasToBeRemoved);
+					return;
+
+				} else if (attribute == JSONIngameAttributes.TIMEEXPIRED) {
+
+					for (Node image : cardView.getChildren()) {
+
+						ImageView temp = (ImageView) image;
+						if (cardList.get(temp).equals(to_remove)) {
+							hasToBeRemoved = image;
+							break;
+						}
+
+					}
+
+					cardView.getChildren().remove(hasToBeRemoved);
+
+				}
+
+			}
+		});
 
 	}
 

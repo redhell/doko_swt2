@@ -74,8 +74,6 @@ public class LobbyScreen implements GuiScreen, Runnable {
 
 		JSONObject json = new JSONObject(jsonString);
 
-		System.out.println("message: " + jsonString);
-
 		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.USERLIST.name())) {
 			Platform.runLater(new Runnable() {
 				@Override
@@ -139,6 +137,13 @@ public class LobbyScreen implements GuiScreen, Runnable {
 					gui.changeToGame();
 				}
 			});
+
+			return;
+		}
+		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.FLUSH.name())) {
+
+			flush();
+			flush();
 
 			return;
 		}
@@ -223,6 +228,12 @@ public class LobbyScreen implements GuiScreen, Runnable {
 		connectionSocket.sendMessage(json.toString());
 	}
 
+	private void flush(){
+		JSONObject json = new JSONObject();
+		json.put(JSONActionsE.EVENT.name(), JSONEventsE.FLUSH.name());
+		connectionSocket.sendMessage(json.toString());
+	}
+	
 	@Override
 	public Pane getScreen() {
 		return pane;

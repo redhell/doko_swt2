@@ -7,6 +7,7 @@ import java.util.List;
 
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,26 +18,26 @@ import javafx.scene.text.FontWeight;
 public class RightPlayerField extends PlayerFieldPane {
 
 	private List<ImageView> cardList;
-	
+
 	private Label usernameLabel;
-	
+
 	public RightPlayerField(String username) {
 		super(username);
-		
+
 		pane = new VBox(5);
 
 		usernameLabel = new Label(username);
 		usernameLabel.setAlignment(Pos.BOTTOM_CENTER);
 		usernameLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		
+
 		cardList = new LinkedList<ImageView>();
-		
+
 		buildScreen();
 	}
-	
+
 	@Override
 	public void buildScreen() {
-		
+
 		FileInputStream input = null;
 		Image image = null;
 		try {
@@ -49,7 +50,7 @@ public class RightPlayerField extends PlayerFieldPane {
 		for (int i = 0; i < 10; i++) {
 			cardList.add(new ImageView(image));
 		}
-		
+
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -58,5 +59,26 @@ public class RightPlayerField extends PlayerFieldPane {
 			}
 		});
 	}
+	
+	public void removeCard() {
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+
+				Node to_remove = null;
+
+				for (Node n : pane.getChildren()) {
+					if (n instanceof ImageView) {
+						to_remove = n;
+						break;
+					}
+				}
+
+				pane.getChildren().remove(to_remove);
+			}
+		});
+	}
+
 
 }
