@@ -12,13 +12,15 @@ public class Gui extends Application {
 	private GuiScreen guiScreen;
 	private Thread currentScreen;
 	
-	private static final int window_width = 1024;
-	private static final int window_height = 850;
-	private static final boolean resizable = true;
+	private static int window_width = 700;
+	private static int window_height = 550;
+	private static final boolean resizable = false;
 	
 	
 	public Gui() {
-		guiScreen = new LoginScreen(this);
+		guiScreen = new GameScreen(this);
+		//guiScreen = new LobbyScreen(this);
+		//guiScreen = new LoginScreen(this);
 		mainScene = new Scene(guiScreen.getScreen());
 	}
 
@@ -26,12 +28,14 @@ public class Gui extends Application {
 	public void start(Stage primaryStage) throws Exception {
 
 		this.mainStage = primaryStage;
+		
+		mainStage.setTitle("Doppelkopf Ultimate");
 
 		mainStage.setScene(mainScene);
-
 		mainStage.setResizable(resizable);
 		mainStage.setWidth(window_width);
 		mainStage.setHeight(window_height);
+		
 
 		mainStage.show();
 
@@ -56,4 +60,15 @@ public class Gui extends Application {
 		return mainStage;
 	}
 	
+	public void setWidth(int w) {
+		window_width = w;
+	}
+	
+	public void setHeight(int h) {
+		window_height = h;
+	}
+	
+	public void StageResizable(boolean sizeable) {
+		mainStage.setResizable(sizeable);
+	}
 }
