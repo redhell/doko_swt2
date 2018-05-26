@@ -31,7 +31,9 @@ public class GameScreen implements GuiScreen, Runnable {
 
 	public GameScreen(Gui gui) {
 		this.gui = gui;
-
+		
+		gui.StageResizable(true);
+		
 		connectionSocket = ConnectionSocket.getInstance();
 
 		gameScreenSync = new GameScreenSync(this, connectionSocket.getUsername());

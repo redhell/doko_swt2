@@ -1,5 +1,8 @@
 package gui;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -47,7 +50,12 @@ public class LoginScreen implements GuiScreen {
 		password_field = new PasswordField();
 		login_failed_label = new Label();
 		
-		image = new Image("doko.jpg");
+		try {
+			image = new Image(new FileInputStream("assets/doko.png"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, 
 				BackgroundPosition.CENTER, new BackgroundSize(700, 550, false, false, false, false));
 

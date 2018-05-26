@@ -11,16 +11,17 @@ public class Gui extends Application {
 	
 	private GuiScreen guiScreen;
 	private Thread currentScreen;
+
+	private static final int window_width = 700;
+	private static final int window_height = 550;
+	private static final int GAMESCREEN_WIDTH = 700;
+	private static final int GAMESCREEN_HEIGHT = 550;
 	
-	private static int window_width = 700;
-	private static int window_height = 550;
 	private static final boolean resizable = false;
 	
 	
 	public Gui() {
-		guiScreen = new GameScreen(this);
-		//guiScreen = new LobbyScreen(this);
-		//guiScreen = new LoginScreen(this);
+		guiScreen = new LoginScreen(this);
 		mainScene = new Scene(guiScreen.getScreen());
 	}
 

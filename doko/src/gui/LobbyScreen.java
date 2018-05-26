@@ -1,5 +1,7 @@
 package gui;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -65,7 +67,12 @@ public class LobbyScreen implements GuiScreen, Runnable {
 
 		connectionSocket = ConnectionSocket.getInstance();
 		
-		image = new Image("lobby.jpg");
+		try {
+			image = new Image(new FileInputStream("assets/lobby.png"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		bi = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
 				BackgroundPosition.CENTER, new BackgroundSize(480, 360, false, false, false, false));
 
