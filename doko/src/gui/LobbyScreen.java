@@ -6,6 +6,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.sun.prism.paint.Color;
+
 import backend.ConnectionSocket;
 import backend.enums.JSONActionsE;
 import backend.enums.JSONEventsE;
@@ -15,15 +17,22 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 public class LobbyScreen implements GuiScreen, Runnable {
 
@@ -40,6 +49,9 @@ public class LobbyScreen implements GuiScreen, Runnable {
 	private Label amount_score;
 
 	private Label amount_queue;
+	
+	private Image image;
+	private BackgroundImage bi;
 
 	private ConnectionSocket connectionSocket;
 
@@ -52,6 +64,10 @@ public class LobbyScreen implements GuiScreen, Runnable {
 		userList = new ListView<>(users);
 
 		connectionSocket = ConnectionSocket.getInstance();
+		
+		image = new Image("lobby.jpg");
+		bi = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+				BackgroundPosition.CENTER, new BackgroundSize(480, 360, false, false, false, false));
 
 		buildScreen();
 	}
@@ -152,20 +168,32 @@ public class LobbyScreen implements GuiScreen, Runnable {
 
 	private void buildScreen() {
 
-		amount_games = new Label("#Games: ");
-		amount_wins = new Label("#Wins: ");
-		amount_lost = new Label("#Lost: ");
-		amount_score = new Label("#Score: ");
+		amount_games = new Label("Games: ");
+		amount_games.setFont(Font.font(16));
+		//Label White Color
+		amount_wins = new Label("Wins: ");
+		amount_wins.setFont(Font.font(16));
+		amount_lost = new Label("Lost: ");
+		amount_lost.setFont(Font.font(16));
+		amount_score = new Label("Score: ");
+		amount_score.setFont(Font.font(16));
 
 		VBox statistics = new VBox();
+		statistics.setPadding(new Insets(10, 50, 50, 10));
+		
 		statistics.getChildren().add(amount_games);
 		statistics.getChildren().add(amount_wins);
 		statistics.getChildren().add(amount_lost);
 		statistics.getChildren().add(amount_score);
 
 		VBox hbox = new VBox();
+		hbox.setPadding(new Insets(10,10,10,10));
+		hbox.setSpacing(10);
+		
 		amount_queue = new Label("In Queue: ");
+		amount_queue.setFont(Font.font(16));
 		Button startGame_button = new Button("Start Game");
+		startGame_button.setPadding(new Insets(10, 10, 10, 10));
 		startGame_button.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -178,11 +206,27 @@ public class LobbyScreen implements GuiScreen, Runnable {
 
 		hbox.getChildren().add(amount_queue);
 		hbox.getChildren().add(startGame_button);
-
+		hbox.setPadding(new Insets(100,0,0,10));
+		userList.setPadding(new Insets(10,10,10,10));
+		userList.setMaxHeight(360);
+		userList.setMaxWidth(140);
+		//Transparent ListView
+		//userList.setStyle();
+		
+		
+		VBox vb = new VBox();
+		vb.getChildren().addAll(statistics, hbox);
+		
+		
 		pane = new BorderPane();
+		pane.setBackground(new Background(bi));
 		((BorderPane) pane).setRight(userList);
-		((BorderPane) pane).setCenter(statistics);
-		((BorderPane) pane).setBottom(hbox);
+		((BorderPane) pane).setCenter(vb);
+		//((BorderPane) pane).setBottom(hbox);
+		
+		
+		gui.setHeight(360);
+		gui.setWidth(480);
 
 	}
 
