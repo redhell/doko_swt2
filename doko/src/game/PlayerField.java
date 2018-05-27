@@ -95,8 +95,9 @@ public class PlayerField extends PlayerFieldPane {
 
 			String wertigkeit = temp.getString(CardE.WERTIGKEIT.name());
 			String symbol = temp.getString(CardE.SYMBOL.name());
+			boolean trumpf = temp.getBoolean(CardE.TRUMPF.name());
 
-			Card card = new Card(WertigkeitE.valueOf(wertigkeit), SymbolE.valueOf(symbol));
+			Card card = new Card(WertigkeitE.valueOf(wertigkeit), SymbolE.valueOf(symbol),trumpf);
 
 			try {
 				input = new FileInputStream(card.getPath());
@@ -138,6 +139,8 @@ public class PlayerField extends PlayerFieldPane {
 					JSONObject jsonCard = new JSONObject();
 					jsonCard.put(CardE.WERTIGKEIT.name(), currentCardPicked.getWertigkeit());
 					jsonCard.put(CardE.SYMBOL.name(), currentCardPicked.getSymbol());
+					jsonCard.put(CardE.TRUMPF.name(), currentCardPicked.isTrumpf());
+					
 					json.put(JSONIngameAttributes.CARD.name(), jsonCard);
 
 					connectionSocket.sendMessage(json.toString());

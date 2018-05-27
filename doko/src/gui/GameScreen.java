@@ -27,7 +27,7 @@ public class GameScreen implements GuiScreen, Runnable {
 	private PlayerField playerField;
 	private GameScreenSync gameScreenSync;
 
-	public static final int ROUNDTIMER = 10;
+	public static final int ROUNDTIMER = 60 * 2;
 
 	public GameScreen(Gui gui) {
 		this.gui = gui;
@@ -82,8 +82,9 @@ public class GameScreen implements GuiScreen, Runnable {
 				JSONObject jsonCard = (JSONObject) json.get(JSONIngameAttributes.CARD.name());
 				WertigkeitE wertigkeit = WertigkeitE.valueOf(jsonCard.get(CardE.WERTIGKEIT.name()).toString());
 				SymbolE symbol = SymbolE.valueOf(jsonCard.get(CardE.SYMBOL.name()).toString());
-
-				Card parsedCard = new Card(wertigkeit, symbol);
+				boolean trumpf = jsonCard.getBoolean(CardE.TRUMPF.name());
+				
+				Card parsedCard = new Card(wertigkeit, symbol,trumpf);
 
 				playerField.makeMove(JSONIngameAttributes.VALID, parsedCard);
 				playerField.removeCardFromDeck(parsedCard, JSONIngameAttributes.VALID);
@@ -95,8 +96,9 @@ public class GameScreen implements GuiScreen, Runnable {
 				JSONObject jsonCard = (JSONObject) json.get(JSONIngameAttributes.CARD.name());
 				WertigkeitE wertigkeit = WertigkeitE.valueOf(jsonCard.get(CardE.WERTIGKEIT.name()).toString());
 				SymbolE symbol = SymbolE.valueOf(jsonCard.get(CardE.SYMBOL.name()).toString());
-
-				Card parsedCard = new Card(wertigkeit, symbol);
+				boolean trumpf = jsonCard.getBoolean(CardE.TRUMPF.name());
+				
+				Card parsedCard = new Card(wertigkeit, symbol,trumpf);
 
 				playerField.makeMove(JSONIngameAttributes.TIMEEXPIRED, parsedCard);
 				playerField.removeCardFromDeck(parsedCard, JSONIngameAttributes.TIMEEXPIRED);
@@ -112,8 +114,9 @@ public class GameScreen implements GuiScreen, Runnable {
 			JSONObject jsonCard = (JSONObject) json.get(JSONIngameAttributes.CARD.name());
 			WertigkeitE wertigkeit = WertigkeitE.valueOf(jsonCard.get(CardE.WERTIGKEIT.name()).toString());
 			SymbolE symbol = SymbolE.valueOf(jsonCard.get(CardE.SYMBOL.name()).toString());
-
-			Card parsedCard = new Card(wertigkeit, symbol);
+			boolean trumpf = jsonCard.getBoolean(CardE.TRUMPF.name());
+			
+			Card parsedCard = new Card(wertigkeit, symbol,trumpf);
 
 			String playedBy = json.getString(JSONIngameAttributes.PLAYEDBY.name());
 
