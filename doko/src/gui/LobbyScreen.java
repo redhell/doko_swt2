@@ -8,8 +8,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.sun.prism.paint.Color;
-
 import backend.ConnectionSocket;
 import backend.enums.JSONActionsE;
 import backend.enums.JSONEventsE;
@@ -32,6 +30,7 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -177,13 +176,16 @@ public class LobbyScreen implements GuiScreen, Runnable {
 
 		amount_games = new Label("Games: ");
 		amount_games.setFont(Font.font(16));
-		//Label White Color
+		amount_games.setTextFill(javafx.scene.paint.Color.WHEAT);
 		amount_wins = new Label("Wins: ");
 		amount_wins.setFont(Font.font(16));
+		amount_wins.setTextFill(javafx.scene.paint.Color.WHEAT);
 		amount_lost = new Label("Lost: ");
 		amount_lost.setFont(Font.font(16));
+		amount_lost.setTextFill(javafx.scene.paint.Color.WHEAT);
 		amount_score = new Label("Score: ");
 		amount_score.setFont(Font.font(16));
+		amount_score.setTextFill(javafx.scene.paint.Color.WHEAT);
 
 		VBox statistics = new VBox();
 		statistics.setPadding(new Insets(10, 50, 50, 10));
@@ -193,12 +195,13 @@ public class LobbyScreen implements GuiScreen, Runnable {
 		statistics.getChildren().add(amount_lost);
 		statistics.getChildren().add(amount_score);
 
-		VBox hbox = new VBox();
-		hbox.setPadding(new Insets(10,10,10,10));
-		hbox.setSpacing(10);
+		VBox vbox = new VBox();
+		vbox.setPadding(new Insets(10,10,10,10));
+		vbox.setSpacing(10);
 		
 		amount_queue = new Label("In Queue: ");
 		amount_queue.setFont(Font.font(16));
+		amount_queue.setTextFill(javafx.scene.paint.Color.WHEAT);
 		Button startGame_button = new Button("Start Game");
 		startGame_button.setPadding(new Insets(10, 10, 10, 10));
 		startGame_button.setOnAction(new EventHandler<ActionEvent>() {
@@ -211,9 +214,27 @@ public class LobbyScreen implements GuiScreen, Runnable {
 			}
 		});
 
-		hbox.getChildren().add(amount_queue);
-		hbox.getChildren().add(startGame_button);
-		hbox.setPadding(new Insets(100,0,0,10));
+		Button logout_button = new Button("Log Out");
+		logout_button.setPadding(new Insets(10, 10, 10,10));
+		logout_button.setOnAction(new EventHandler<ActionEvent>() {	
+			
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		HBox hb = new HBox();
+		hb.setPadding(new Insets(10, 10, 10, 0));
+		hb.setSpacing(10);
+		
+		hb.getChildren().addAll(startGame_button, logout_button);
+		
+		vbox.getChildren().add(amount_queue);
+		vbox.getChildren().add(hb);
+		vbox.setPadding(new Insets(100,0,0,10));
 		userList.setPadding(new Insets(10,10,10,10));
 		userList.setMaxHeight(360);
 		userList.setMaxWidth(140);
@@ -222,7 +243,7 @@ public class LobbyScreen implements GuiScreen, Runnable {
 		
 		
 		VBox vb = new VBox();
-		vb.getChildren().addAll(statistics, hbox);
+		vb.getChildren().addAll(statistics, vbox);
 		
 		
 		pane = new BorderPane();
