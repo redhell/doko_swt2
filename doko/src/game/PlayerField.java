@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import backend.ConnectionSocket;
+import backend.enums.GamemodeE;
 import backend.enums.JSONActionsE;
 import backend.enums.JSONEventsE;
 import backend.enums.JSONIngameAttributes;
@@ -50,7 +51,11 @@ public class PlayerField extends PlayerFieldPane {
 
 	private VBox gameInfoBox;
 	private Label gameInfo;
+	private Label gameModeLabel;
 	private Button playCardButton;
+	private Button normalGameButton;
+	private Button fleischlosGameButton;
+	private Button farbstichGameButton;
 
 	Map<ImageView, Card> cardList = new HashMap<ImageView, Card>();
 
@@ -60,6 +65,8 @@ public class PlayerField extends PlayerFieldPane {
 
 	private Card currentCardPicked = null;
 	private String currentCardID = "-1";
+	
+	private boolean gameMode = false;
 
 	public PlayerField(GameScreen gameScreen, GameScreenSync gameScreenSync, String username) {
 		super(username);
@@ -75,13 +82,22 @@ public class PlayerField extends PlayerFieldPane {
 		usernameBox.getChildren().add(usernameLabel);
 		usernameBox.setAlignment(Pos.CENTER);
 
-		timeLabel = new Label("Time left:");
+		timeLabel = new Label();
+		timeLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
 		gameInfoBox = new VBox();
 		playCardButton = new Button("play Card");
+		normalGameButton = new Button("Normales Spiel");
+		fleischlosGameButton = new Button("Fleischlos");
+		farbstichGameButton = new Button("Farbstich");
 		gameInfo = new Label("");
+		gameModeLabel = new Label("");
+
 		gameInfoBox.getChildren().add(gameInfo);
-		gameInfoBox.getChildren().add(playCardButton);
+		gameInfoBox.getChildren().add(gameModeLabel);
+		gameInfoBox.getChildren().add(normalGameButton);
+		gameInfoBox.getChildren().add(fleischlosGameButton);
+		gameInfoBox.getChildren().add(farbstichGameButton);
 
 	}
 
@@ -150,6 +166,66 @@ public class PlayerField extends PlayerFieldPane {
 
 			}
 		});
+		
+		normalGameButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+
+				if (gameMode) {
+					
+					JSONObject json = new JSONObject();
+					json.put(JSONActionsE.EVENT.name(), JSONEventsE.GETGAMEMODE.name());
+					json.put(JSONEventsE.GETGAMEMODE.name(), GamemodeE.NORMAL.name());
+					
+					connectionSocket.sendMessage(json.toString());
+					
+					gameMode = false;
+				}
+
+			}
+		});
+		
+		fleischlosGameButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+
+				if (gameMode) {
+
+					
+					JSONObject json = new JSONObject();
+					json.put(JSONActionsE.EVENT.name(), JSONEventsE.GETGAMEMODE.name());
+					json.put(JSONEventsE.GETGAMEMODE.name(), GamemodeE.FLEISCHLOS.name());
+					
+					connectionSocket.sendMessage(json.toString());
+					
+					gameMode = false;
+				}
+
+			}
+		});
+		
+		farbstichGameButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+
+				if (gameMode) {
+
+					JSONObject json = new JSONObject();
+					json.put(JSONActionsE.EVENT.name(), JSONEventsE.GETGAMEMODE.name());
+					json.put(JSONEventsE.GETGAMEMODE.name(), GamemodeE.FARBSTICH.name());
+					
+					connectionSocket.sendMessage(json.toString());
+					
+					gameMode = false;
+				}
+
+			}
+		});
+		
+		
 
 		Platform.runLater(new Runnable() {
 
@@ -283,6 +359,41 @@ public class PlayerField extends PlayerFieldPane {
 			}
 		});
 
+	}
+
+	public void setGameMode(GamemodeE mode) {
+		
+		String text = "";
+		
+		if(mode == null){
+			gameMode = true;			
+			return;
+		}else if(mode == GamemodeE.NORMAL){
+			text = "GAMEMODE: NORMAL";
+		}else if(mode == GamemodeE.FLEISCHLOS){
+			text = "GAMEMODE: FLEISCHLOS";
+		}else if(mode == GamemodeE.FARBSTICH){
+			text = "GAMEMODE: FARBSTICH";
+		}
+		
+		final String gameModeLabelText = text;
+
+		Platform.runLater(new Runnable() {
+			
+			@Override
+			public void run() {
+		
+				gameModeLabel.setText(gameModeLabelText);
+				
+				gameInfoBox.getChildren().clear();
+				
+				gameInfoBox.getChildren().add(gameInfo);
+				gameInfoBox.getChildren().add(gameModeLabel);
+				gameInfoBox.getChildren().add(playCardButton);
+				
+			}
+		});
+		
 	}
 
 }
