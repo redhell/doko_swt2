@@ -9,7 +9,3 @@ public class Main {
 	}
 
 }
-//a b c d
-//d a b c
-//b c d a
-//c d a b

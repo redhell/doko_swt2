@@ -59,8 +59,6 @@ public class PlayerField extends PlayerFieldPane {
 
 	Map<ImageView, Card> cardList = new HashMap<ImageView, Card>();
 
-	private final static double cardScale = 1.25;
-
 	private volatile boolean canMove = false;
 
 	private Card currentCardPicked = null;
