@@ -1,5 +1,6 @@
 package gui;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import backend.ConnectionSocket;
@@ -14,7 +15,6 @@ import entities.WertigkeitE;
 import game.GameScreenSync;
 import game.PlayerField;
 import javafx.application.Platform;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 
@@ -141,6 +141,15 @@ public class GameScreen implements GuiScreen, Runnable {
 
 			}
 
+		} else if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.GAMEWINNER.name())) {
+
+			JSONArray jsonWinner = json.getJSONArray(JSONEventsE.GAMEWINNER.name());
+			
+			for(int i=0;i<jsonWinner.length();i++){
+				System.out.println(jsonWinner.get(i));
+			}
+			
+			
 		}
 
 	}
