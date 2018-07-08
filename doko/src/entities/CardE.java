@@ -1,5 +1,5 @@
 package entities;
 
 public enum CardE {
-	WERTIGKEIT, SYMBOL, TRUMPF
+	WERTIGKEIT, SYMBOL, TRUMPF, SCHWEINCHEN
 }

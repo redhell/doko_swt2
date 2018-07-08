@@ -110,8 +110,10 @@ public class PlayerField extends PlayerFieldPane {
 			String wertigkeit = temp.getString(CardE.WERTIGKEIT.name());
 			String symbol = temp.getString(CardE.SYMBOL.name());
 			boolean trumpf = temp.getBoolean(CardE.TRUMPF.name());
+			boolean schweinchen = temp.getBoolean(CardE.SCHWEINCHEN.name());
 
 			Card card = new Card(WertigkeitE.valueOf(wertigkeit), SymbolE.valueOf(symbol),trumpf);
+			card.setSchweinchen(schweinchen);
 
 			try {
 				input = new FileInputStream(card.getPath());

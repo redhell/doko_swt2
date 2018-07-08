@@ -8,6 +8,7 @@ public class Card implements Comparable<Card> {
 	private SymbolE symbol;
 	private WertigkeitE wertigkeit;
 	private boolean trumpf;
+	private boolean schweinchen;
 
 	public Card(WertigkeitE wertigkeit, SymbolE symbol, boolean trumpf) {
 		this.wertigkeit = wertigkeit;
@@ -64,4 +65,12 @@ public class Card implements Comparable<Card> {
 		return this.symbol == otherCard.symbol && this.wertigkeit == otherCard.wertigkeit;
 	}
 
+	public boolean isSchweinchen() {
+		return schweinchen;
+	}
+
+	public void setSchweinchen(boolean schweinchen) {
+		this.schweinchen = schweinchen;
+	}
+	
 }

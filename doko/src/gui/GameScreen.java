@@ -28,7 +28,8 @@ public class GameScreen implements GuiScreen, Runnable {
 	private PlayerField playerField;
 	private GameScreenSync gameScreenSync;
 
-	public static final int ROUNDTIMER = 60 * 2;
+	//sec
+	public static final int ROUNDTIMER = 45;
 
 	public GameScreen(Gui gui) {
 		this.gui = gui;
@@ -134,6 +135,7 @@ public class GameScreen implements GuiScreen, Runnable {
 				} else if (json.getString(JSONEventsE.GETGAMEMODE.name()).equals(GamemodeE.FARBSTICH.name())) {
 					playerField.setGameMode(GamemodeE.FARBSTICH);
 				}
+				
 
 			} else {
 
@@ -146,7 +148,7 @@ public class GameScreen implements GuiScreen, Runnable {
 			JSONArray jsonWinner = json.getJSONArray(JSONEventsE.GAMEWINNER.name());
 			
 			for(int i=0;i<jsonWinner.length();i++){
-				System.out.println(jsonWinner.get(i));
+				System.out.println(((JSONObject)jsonWinner.get(i)).get("player") + " : " + ((JSONObject)jsonWinner.get(i)).get("score"));
 			}
 			
 			
