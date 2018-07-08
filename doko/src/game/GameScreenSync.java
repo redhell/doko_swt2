@@ -33,7 +33,6 @@ public class GameScreenSync {
 
 	public void buildScreen(JSONObject json) {
 
-		System.out.println("build");
 		Map<String, String> orderMap = new HashMap<String, String>();
 
 		JSONObject orders = (JSONObject) json.get(JSONIngameAttributes.ORDER.name());
@@ -56,28 +55,24 @@ public class GameScreenSync {
 
 		if (clientIndex == 1) {
 
-			System.out.println("1");
 			leftPlayer = new LeftPlayerField(orderMap.get(keys.get(1)));
 			topPlayer = new TopPlayerField(orderMap.get(keys.get(2)));
 			rightPlayer = new RightPlayerField(orderMap.get(keys.get(3)));
 
 		} else if (clientIndex == 2) {
 
-			System.out.println("2");
 			leftPlayer = new LeftPlayerField(orderMap.get(keys.get(2)));
 			topPlayer = new TopPlayerField(orderMap.get(keys.get(3)));
 			rightPlayer = new RightPlayerField(orderMap.get(keys.get(0)));
 
 		} else if (clientIndex == 3) {
 
-			System.out.println("3");
 			leftPlayer = new LeftPlayerField(orderMap.get(keys.get(3)));
 			topPlayer = new TopPlayerField(orderMap.get(keys.get(0)));
 			rightPlayer = new RightPlayerField(orderMap.get(keys.get(1)));
 
 		} else if (clientIndex == 4) {
 
-			System.out.println("4");
 			leftPlayer = new LeftPlayerField(orderMap.get(keys.get(0)));
 			topPlayer = new TopPlayerField(orderMap.get(keys.get(1)));
 			rightPlayer = new RightPlayerField(orderMap.get(keys.get(2)));

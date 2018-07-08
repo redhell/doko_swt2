@@ -2,6 +2,7 @@ package gui;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class Gui extends Application {
@@ -99,6 +100,10 @@ public class Gui extends Application {
 
 	public void StageResizable(boolean sizeable) {
 		mainStage.setResizable(sizeable);
+	}
+	
+	public void changeScene(Pane root){
+		mainScene.setRoot(root);
 	}
 
 }

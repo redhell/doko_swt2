@@ -1,5 +1,8 @@
 package gui;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,8 +18,22 @@ import entities.WertigkeitE;
 import game.GameScreenSync;
 import game.PlayerField;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class GameScreen implements GuiScreen, Runnable {
 
@@ -28,7 +45,7 @@ public class GameScreen implements GuiScreen, Runnable {
 	private PlayerField playerField;
 	private GameScreenSync gameScreenSync;
 
-	//sec
+	// sec
 	public static final int ROUNDTIMER = 45;
 
 	public GameScreen(Gui gui) {
@@ -135,7 +152,6 @@ public class GameScreen implements GuiScreen, Runnable {
 				} else if (json.getString(JSONEventsE.GETGAMEMODE.name()).equals(GamemodeE.FARBSTICH.name())) {
 					playerField.setGameMode(GamemodeE.FARBSTICH);
 				}
-				
 
 			} else {
 
@@ -145,14 +161,83 @@ public class GameScreen implements GuiScreen, Runnable {
 
 		} else if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.GAMEWINNER.name())) {
 
-			JSONArray jsonWinner = json.getJSONArray(JSONEventsE.GAMEWINNER.name());
-			
-			for(int i=0;i<jsonWinner.length();i++){
-				System.out.println(((JSONObject)jsonWinner.get(i)).get("player") + " : " + ((JSONObject)jsonWinner.get(i)).get("score"));
-			}
-			
-			
+			JSONObject jsonObj = json.getJSONObject(JSONEventsE.GAMEWINNER.name());
+
+			JSONArray winnerArr = jsonObj.getJSONArray("winner");
+			JSONArray loserArr = jsonObj.getJSONArray("loser");
+
+			gameFinished(winnerArr, loserArr);
+
+		} else if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.SHOWSCORE.name())) {
+			playerField.showCurrentScore(json.toString());
 		}
+
+	}
+
+	private void gameFinished(JSONArray winnerArr, JSONArray loserArr) {
+
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+
+				pane.getChildren().clear();
+				try {
+					
+					Image image = new Image(new FileInputStream("assets/game_finish_background.png"));
+				
+					BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, 
+							BackgroundPosition.CENTER, new BackgroundSize(Gui.window_width, Gui.window_height, false, false, false, false));
+					pane = new GridPane();
+					((GridPane) pane).setAlignment(Pos.CENTER_LEFT);
+					((GridPane) pane).setHgap(10);
+					((GridPane) pane).setVgap(10);
+					pane.setPadding(new Insets(25, 25, 25, 25));
+					pane.setBackground(new Background(backgroundImage));
+					
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+
+				VBox vbox = new VBox();
+				Label l1 = new Label("WINNER:");
+				l1.setTextFill(Color.WHITE);
+				l1.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+				
+				vbox.getChildren().add(l1);
+				
+				for(int i=0;i<winnerArr.length();i++){
+					JSONObject temp1 = winnerArr.getJSONObject(i);
+					Label tempWinner = new Label("Player: " + temp1.getString("name") + "  " + "Points: " + temp1.getInt("score"));
+					tempWinner.setTextFill(Color.WHITE);
+					tempWinner.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+					vbox.getChildren().add(tempWinner);
+				}
+				
+				Label seperatorL = new Label("________________");
+				l1.setTextFill(Color.WHITE);
+				l1.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+				vbox.getChildren().add(seperatorL);
+				
+				Label l2 = new Label("LOSER:");
+				l2.setTextFill(Color.WHITE);
+				l2.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+				vbox.getChildren().add(l2);				
+				for(int i=0;i<loserArr.length();i++){
+					JSONObject temp2 = loserArr.getJSONObject(i);
+					Label tempLoser = new Label("Player: " + temp2.getString("name") + "  " + "Points: " + temp2.getInt("score"));
+					tempLoser.setTextFill(Color.WHITE);
+					tempLoser.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+					vbox.getChildren().add(tempLoser);
+				}
+				
+				((GridPane) pane).add(vbox, 15, 0, 2, 1);
+				
+				gui.changeScene(pane);
+				
+			}
+
+		});
 
 	}
 
@@ -202,6 +287,10 @@ public class GameScreen implements GuiScreen, Runnable {
 	@Override
 	public Pane getScreen() {
 		return pane;
+	}
+
+	public Gui getGui() {
+		return gui;
 	}
 
 }

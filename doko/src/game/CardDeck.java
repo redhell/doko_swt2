@@ -67,9 +67,7 @@ public class CardDeck {
 			@Override
 			public void run() {
 
-				System.out.println("carddeck size: " + pane.getChildren().size());
 				pane.getChildren().clear();
-				System.out.println("carddeck size after: " + pane.getChildren().size());
 
 				Label roundWonBy = new Label();
 				roundWonBy.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));

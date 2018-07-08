@@ -23,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -34,6 +35,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class PlayerField extends PlayerFieldPane {
 
@@ -56,6 +59,7 @@ public class PlayerField extends PlayerFieldPane {
 	private Button normalGameButton;
 	private Button fleischlosGameButton;
 	private Button farbstichGameButton;
+	private Button showScore;
 
 	Map<ImageView, Card> cardList = new HashMap<ImageView, Card>();
 
@@ -63,7 +67,7 @@ public class PlayerField extends PlayerFieldPane {
 
 	private Card currentCardPicked = null;
 	private String currentCardID = "-1";
-	
+
 	private boolean gameMode = false;
 
 	public PlayerField(GameScreen gameScreen, GameScreenSync gameScreenSync, String username) {
@@ -90,6 +94,7 @@ public class PlayerField extends PlayerFieldPane {
 		farbstichGameButton = new Button("Farbstich");
 		gameInfo = new Label("");
 		gameModeLabel = new Label("");
+		showScore = new Button("show Score");
 
 		gameInfoBox.getChildren().add(gameInfo);
 		gameInfoBox.getChildren().add(gameModeLabel);
@@ -112,7 +117,7 @@ public class PlayerField extends PlayerFieldPane {
 			boolean trumpf = temp.getBoolean(CardE.TRUMPF.name());
 			boolean schweinchen = temp.getBoolean(CardE.SCHWEINCHEN.name());
 
-			Card card = new Card(WertigkeitE.valueOf(wertigkeit), SymbolE.valueOf(symbol),trumpf);
+			Card card = new Card(WertigkeitE.valueOf(wertigkeit), SymbolE.valueOf(symbol), trumpf);
 			card.setSchweinchen(schweinchen);
 
 			try {
@@ -156,7 +161,7 @@ public class PlayerField extends PlayerFieldPane {
 					jsonCard.put(CardE.WERTIGKEIT.name(), currentCardPicked.getWertigkeit());
 					jsonCard.put(CardE.SYMBOL.name(), currentCardPicked.getSymbol());
 					jsonCard.put(CardE.TRUMPF.name(), currentCardPicked.isTrumpf());
-					
+
 					json.put(JSONIngameAttributes.CARD.name(), jsonCard);
 
 					connectionSocket.sendMessage(json.toString());
@@ -166,26 +171,26 @@ public class PlayerField extends PlayerFieldPane {
 
 			}
 		});
-		
+
 		normalGameButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
 
 				if (gameMode) {
-					
+
 					JSONObject json = new JSONObject();
 					json.put(JSONActionsE.EVENT.name(), JSONEventsE.GETGAMEMODE.name());
 					json.put(JSONEventsE.GETGAMEMODE.name(), GamemodeE.NORMAL.name());
-					
+
 					connectionSocket.sendMessage(json.toString());
-					
+
 					gameMode = false;
 				}
 
 			}
 		});
-		
+
 		fleischlosGameButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -193,19 +198,18 @@ public class PlayerField extends PlayerFieldPane {
 
 				if (gameMode) {
 
-					
 					JSONObject json = new JSONObject();
 					json.put(JSONActionsE.EVENT.name(), JSONEventsE.GETGAMEMODE.name());
 					json.put(JSONEventsE.GETGAMEMODE.name(), GamemodeE.FLEISCHLOS.name());
-					
+
 					connectionSocket.sendMessage(json.toString());
-					
+
 					gameMode = false;
 				}
 
 			}
 		});
-		
+
 		farbstichGameButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -216,17 +220,31 @@ public class PlayerField extends PlayerFieldPane {
 					JSONObject json = new JSONObject();
 					json.put(JSONActionsE.EVENT.name(), JSONEventsE.GETGAMEMODE.name());
 					json.put(JSONEventsE.GETGAMEMODE.name(), GamemodeE.FARBSTICH.name());
-					
+
 					connectionSocket.sendMessage(json.toString());
-					
+
 					gameMode = false;
 				}
 
 			}
 		});
-		
-		
 
+		showScore.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+
+				if(!canMove){
+					JSONObject json = new JSONObject();
+					json.put(JSONActionsE.EVENT.name(), JSONEventsE.SHOWSCORE.name());
+
+					connectionSocket.sendMessage(json.toString());
+
+				}
+
+			}
+		});
+		
 		Platform.runLater(new Runnable() {
 
 			@Override
@@ -252,7 +270,6 @@ public class PlayerField extends PlayerFieldPane {
 			canMove = true;
 			gameInfo.setTextFill(Color.GREEN);
 			setText = "PICK A CARD";
-			System.out.println("PICKACARD");
 		} else if (attribute == JSONIngameAttributes.INVALID) {
 			canMove = true;
 			gameInfo.setTextFill(Color.RED);
@@ -362,38 +379,65 @@ public class PlayerField extends PlayerFieldPane {
 	}
 
 	public void setGameMode(GamemodeE mode) {
-		
+
 		String text = "";
-		
-		if(mode == null){
-			gameMode = true;			
+
+		if (mode == null) {
+			gameMode = true;
 			return;
-		}else if(mode == GamemodeE.NORMAL){
+		} else if (mode == GamemodeE.NORMAL) {
 			text = "GAMEMODE: NORMAL";
-		}else if(mode == GamemodeE.FLEISCHLOS){
+		} else if (mode == GamemodeE.FLEISCHLOS) {
 			text = "GAMEMODE: FLEISCHLOS";
-		}else if(mode == GamemodeE.FARBSTICH){
+		} else if (mode == GamemodeE.FARBSTICH) {
 			text = "GAMEMODE: FARBSTICH";
 		}
-		
+
 		final String gameModeLabelText = text;
 
 		Platform.runLater(new Runnable() {
-			
+
 			@Override
 			public void run() {
-		
+
 				gameModeLabel.setText(gameModeLabelText);
-				
+
 				gameInfoBox.getChildren().clear();
-				
+
 				gameInfoBox.getChildren().add(gameInfo);
 				gameInfoBox.getChildren().add(gameModeLabel);
 				gameInfoBox.getChildren().add(playCardButton);
-				
+				gameInfoBox.getChildren().add(showScore);
+
 			}
 		});
-		
+
+	}
+
+	public void showCurrentScore(String currentScore) {
+
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+
+				JSONObject json = new JSONObject(currentScore);
+
+
+				Stage dialog = new Stage();
+				HBox hboxTemp = new HBox();
+				hboxTemp.getChildren().add(new Label(currentScore));
+				Scene scene = new Scene(hboxTemp);
+				
+				// populate dialog with controls.
+				dialog.setScene(scene);
+
+				dialog.initOwner(gameScreen.getGui().getStage());
+				dialog.initModality(Modality.APPLICATION_MODAL);
+				dialog.showAndWait();
+			}
+
+		});
 	}
 
 }
