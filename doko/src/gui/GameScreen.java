@@ -163,10 +163,10 @@ public class GameScreen implements GuiScreen, Runnable {
 
 			JSONObject jsonObj = json.getJSONObject(JSONEventsE.GAMEWINNER.name());
 
-			JSONArray winnerArr = jsonObj.getJSONArray("winner");
-			JSONArray loserArr = jsonObj.getJSONArray("loser");
+			JSONObject winnerObj = jsonObj.getJSONObject("winner");
+			JSONObject loserObj = jsonObj.getJSONObject("loser");
 
-			gameFinished(winnerArr, loserArr);
+			gameFinished(winnerObj, loserObj);
 
 		} else if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.SHOWSCORE.name())) {
 			playerField.showCurrentScore(json.toString());
@@ -174,7 +174,7 @@ public class GameScreen implements GuiScreen, Runnable {
 
 	}
 
-	private void gameFinished(JSONArray winnerArr, JSONArray loserArr) {
+	private void gameFinished(JSONObject winnerObj, JSONObject loserObj) {
 
 		Platform.runLater(new Runnable() {
 
@@ -206,13 +206,19 @@ public class GameScreen implements GuiScreen, Runnable {
 				
 				vbox.getChildren().add(l1);
 				
+				JSONArray winnerArr = winnerObj.getJSONArray("player");
+				
 				for(int i=0;i<winnerArr.length();i++){
-					JSONObject temp1 = winnerArr.getJSONObject(i);
-					Label tempWinner = new Label("Player: " + temp1.getString("name") + "  " + "Points: " + temp1.getInt("score"));
+					Label tempWinner = new Label("Player: " + winnerArr.getString(i));
 					tempWinner.setTextFill(Color.WHITE);
 					tempWinner.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 					vbox.getChildren().add(tempWinner);
 				}
+				Label scoreL1 = new Label(winnerObj.getString("score"));
+				l1.setTextFill(Color.WHITE);
+				l1.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+				vbox.getChildren().add(scoreL1);
+				
 				
 				Label seperatorL = new Label("________________");
 				l1.setTextFill(Color.WHITE);
@@ -223,13 +229,21 @@ public class GameScreen implements GuiScreen, Runnable {
 				l2.setTextFill(Color.WHITE);
 				l2.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 				vbox.getChildren().add(l2);				
+				
+
+				JSONArray loserArr = loserObj.getJSONArray("player");
+			
 				for(int i=0;i<loserArr.length();i++){
-					JSONObject temp2 = loserArr.getJSONObject(i);
-					Label tempLoser = new Label("Player: " + temp2.getString("name") + "  " + "Points: " + temp2.getInt("score"));
+					Label tempLoser = new Label("Player: " + loserArr.getString(i));
 					tempLoser.setTextFill(Color.WHITE);
 					tempLoser.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 					vbox.getChildren().add(tempLoser);
 				}
+				Label scoreL2 = new Label(winnerObj.getString("score"));
+				l2.setTextFill(Color.WHITE);
+				l2.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+				vbox.getChildren().add(scoreL2);
+				
 				
 				((GridPane) pane).add(vbox, 15, 0, 2, 1);
 				

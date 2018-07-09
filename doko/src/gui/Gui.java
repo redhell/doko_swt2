@@ -12,7 +12,7 @@ public class Gui extends Application {
 
 	private GuiScreen guiScreen;
 	private Thread currentScreen;
-
+	
 	public static final int window_width = 700;
 	public static final int window_height = 550;
 	public static final int GAMESCREEN_WIDTH = 1024;
