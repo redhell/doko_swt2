@@ -36,7 +36,7 @@ public class MoveTimer extends Thread {
 				@Override
 				public void run() {
 			
-					timeLabel.setText(seconds + "");
+					timeLabel.setText("Time left:\n" + seconds);
 					
 				}
 			});

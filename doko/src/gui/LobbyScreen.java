@@ -57,7 +57,8 @@ public class LobbyScreen implements GuiScreen, Runnable {
 
 	private ConnectionSocket connectionSocket;
 
-	private volatile boolean gameStarted = false;
+	private volatile boolean shutdown = false;
+	private boolean done_shutting_down = false;
 
 	public LobbyScreen(Gui gui) {
 		this.gui = gui;
@@ -83,8 +84,10 @@ public class LobbyScreen implements GuiScreen, Runnable {
 	public void run() {
 
 		updateData();
-		while (!gameStarted)
+		while (!shutdown)
 			getNextAction();
+		
+		done_shutting_down = true;
 
 	}
 
@@ -153,7 +156,7 @@ public class LobbyScreen implements GuiScreen, Runnable {
 			return;
 		}
 		if (json.getString(JSONActionsE.EVENT.name()).equals(JSONEventsE.GAMESTART.name())) {
-			gameStarted = true;
+			shutdown = true;
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
@@ -210,9 +213,25 @@ public class LobbyScreen implements GuiScreen, Runnable {
 				connectionSocket.sendMessage(json.toString());
 			}
 		});
+		
+//		Button logout_button = new Button("logout");
+//		logout_button.setPadding(new Insets(10, 10, 10, 10));
+//		logout_button.setOnAction(new EventHandler<ActionEvent>() {
+//
+//			@Override
+//			public void handle(ActionEvent event) {
+//				JSONObject json = new JSONObject();
+//				json.put(JSONActionsE.EVENT.name(), JSONEventsE.LOGOUT.name());
+//				connectionSocket.sendMessage(json.toString());
+//
+//				shutdown();
+//				gui.changeToLogin();
+//			}
+//		});
 
 		hbox.getChildren().add(amount_queue);
 		hbox.getChildren().add(startGame_button);
+		//hbox.getChildren().add(logout_button);
 		hbox.setPadding(new Insets(100,0,0,10));
 		userList.setPadding(new Insets(10,10,10,10));
 		userList.setMaxHeight(360);
@@ -285,9 +304,18 @@ public class LobbyScreen implements GuiScreen, Runnable {
 		connectionSocket.sendMessage(json.toString());
 	}
 	
+	public void shutdown(){
+		shutdown = true;
+	}
+	
+	public boolean isShutdown() {
+		return done_shutting_down;
+	}
+
 	@Override
 	public Pane getScreen() {
 		return pane;
 	}
+
 
 }
